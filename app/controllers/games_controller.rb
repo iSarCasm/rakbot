@@ -8,14 +8,22 @@ class GamesController < ApplicationController
       end
     end
 
-    b = Board.create(game_id: params["id"], width: params["board"]["width"], height: params["board"]["height"], figures: params["board"]["figures_count"], cells: cells.to_json)
+    b = Board.create(game_id: params["id"], width: params["board"]["width"], height: params["board"]["height"], figures: params["board"]["figures_count"], cells: cells.to_json, first_turn: params["first_turn"], turn: 0)
     p b
     render json: {status: :ok}
   end
 
   def show
     p params
+    b = Board.where("game_id = ?", params["id"]).first
+    b.turn += 1
+
+    current_color = turn % 4;
+
     x = [0,1,2,3].sample
+
+
+    b.save
     render json: {
       status: :ok,
       figure: x
@@ -41,6 +49,16 @@ class GamesController < ApplicationController
   def destroy
     p params
     render json: {status: :ok}
+  end
+
+  def figure_volume figure, board
+    volume = 0
+    board.each do |row|
+      row.each do |x|
+        volume += 1 if x["figure"] == figure
+      end
+    end
+    volume
   end
 
   def connects? group_1, group_2, board
