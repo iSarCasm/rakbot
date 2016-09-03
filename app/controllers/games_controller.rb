@@ -1,5 +1,4 @@
 class GamesController < ApplicationController
-
   def create
     p params
     render json: {status: :ok}
@@ -9,7 +8,7 @@ class GamesController < ApplicationController
     p params
     render json: {
       status: :ok,
-      figure: 0
+      figure: [0,1,2,3].sample
     }
   end
 
@@ -22,5 +21,4 @@ class GamesController < ApplicationController
     p params
     render json: {status: :ok}
   end
-
 end

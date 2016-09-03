@@ -1,5 +1,7 @@
 default: &default
   adapter: postgresql
+  username: tester
+  password: test_password
   encoding: unicode
   database: four_color_bot_development
   host: localhost
