@@ -15,14 +15,22 @@ class GamesController < ApplicationController
 
   def show
     p params
+    x = [0,1,2,3].sample
     render json: {
       status: :ok,
-      figure: [0,1,2,3].sample
+      figure: x
     }
   end
 
   def update
     p params
+    b = Board.where("game_id = ?", params["id"]).first
+    p b
+    cells = JSON.parse(b.cells)
+    cells = change_color params["figure"], params["color"], cells
+    b.update(cells: cells.to_json)
+    p "new"
+    p b
     render json: {status: :ok}
   end
 
