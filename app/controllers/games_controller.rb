@@ -18,10 +18,18 @@ class GamesController < ApplicationController
     b = Board.where("game_id = ?", params["id"]).first
     b.turn += 1
 
-    current_color = turn % 4;
+    cells = JSON.parse(b.cells)
 
-    x = [0,1,2,3].sample
-
+    current_color = b.turn % 4;
+    p cells
+    figs = good_figures cells, b.figures
+    figs = very_good_cells(current_color, figs, b.figures, cells)
+    p "good cells are: #{figs}"
+    figs.sort! do |x,y|
+      figure_volume(x, cells) <=> figure_volume(y, cells)
+    end
+    x = figs.last
+    puts "HELLO I SELECT: #{x}"
 
     b.save
     render json: {
@@ -61,6 +69,15 @@ class GamesController < ApplicationController
     volume
   end
 
+  def very_good_cells color, figures, fig_count, cells
+    a = figures.delete_if do |fig|
+      (0...fig_count).to_a.any? do |x|
+        connects?(fig, x, cells) && color == group_color(x, cells)
+      end
+    end
+    a
+  end
+
   def connects? group_1, group_2, board
     for x in 0..board.length-1
       for y in 0..board.length-1
@@ -95,11 +112,11 @@ class GamesController < ApplicationController
   end
 
   def good_figures board, figure_count
-    figures = (1..figure_count).to_a
+    figures = (0...figure_count).to_a
     #ba.each{|row| row.each{|elem| elem[:color]}}
     for x in 0..board.length-1
       for y in 0..board.length-1
-        figures.delete(board[y][x][:figure]) if board[y][x][:color] != nil
+        figures.delete(board[y][x]["figure"]) if board[y][x]["color"] != nil
       end
     end
     figures
