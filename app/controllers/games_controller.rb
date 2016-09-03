@@ -25,8 +25,8 @@ class GamesController < ApplicationController
   def connects? group_1, group_2, board
     for x in 0..board.length-1
       for y in 0..board.length-1
-        if board[y][x] == group_1 then
-          if neighbours(x,y, board).any?{|group| group==group_2} then
+        if board[y][x][:figure] == group_1 then
+          if neighbours(x,y, board).any?{|group| group[:figure]==group_2} then
             return true
           end
         end
@@ -36,18 +36,20 @@ class GamesController < ApplicationController
   end
 
   def neighbours x, y, board
-    neighbours = [] << board[y+1][x] if x < board[0].length
-    neighbours << board[y][x+1] if y < board.length
-    neighbours << board[y-1][x] if y > 0
-    neighbours << board[y][x-1] if x > 0
+    neighbours = [] << board[y+1][x] if y+1 < board.length
+    neighbours << board[y][x+1] if x+1 < board[0].length
+    neighbours << board[y-1][x] if y-1 > 0
+    neighbours << board[y][x-1] if x-1 > 0
+    neighbours << board[y-1][x-1] if x-1 > 0 && y-1 > 0
+    neighbours << board[y+1][x+1] if x+1 < board[0].length && y+1 < board.length
     return neighbours
   end
   #color array = [[-1,-1...]] if no color
   #group and color are numbers
-  def change_color group, color, board, colorArray
+  def change_color group, color, board
     for x in 0..board.length-1
       for y in 0..board.length-1
-        colorArray[y][x] = color if board[y][x] == group
+        board[y][x][:color] = color if board[y][x][:figure] == group
       end
     end
     colorArray
