@@ -4,7 +4,7 @@ class GamesController < ApplicationController
     cells = params["board"]["cells"]
     cells.map! do |row|
       row.map! do |e|
-        {figure: e, color: nil}
+        {"figure" => e, "color" => nil}
       end
     end
 
@@ -75,9 +75,13 @@ class GamesController < ApplicationController
   end
 
   def very_good_cells color, figures, fig_count, cells
+    p cells
+    p neighbours 0, 0, cells
     a = figures.delete_if do |fig|
       (0...fig_count).to_a.any? do |x|
-        connects?(fig, x, cells) && color == group_color(x, cells)
+        puts "Figure #{fig} connects #{x}? = #{connects?(fig, x, cells)}"
+        puts "Same color #{color} and #{group_color(x, cells)}? = #{color.to_i == group_color(x, cells).to_i}"
+        connects?(fig, x, cells) && color.to_i == group_color(x, cells).to_i
       end
     end
     a
@@ -90,8 +94,8 @@ class GamesController < ApplicationController
   def connects? group_1, group_2, board
     for x in 0..board.length-1
       for y in 0..board.length-1
-        if board[y][x][:figure] == group_1 then
-          if neighbours(x,y, board).any?{|group| group[:figure]==group_2} then
+        if board[y][x]["figure"] == group_1 then
+          if neighbours(x,y, board).any?{|group| group["figure"]==group_2} then
             return true
           end
         end
@@ -102,12 +106,22 @@ class GamesController < ApplicationController
 
   def neighbours x, y, board
     neighbours = []
-    neighbours << board[y+1][x] if y+1 < board.length
-    neighbours << board[y][x+1] if x+1 < board[0].length
-    neighbours << board[y-1][x] if y-1 > 0
-    neighbours << board[y][x-1] if x-1 > 0
-    neighbours << board[y-1][x-1] if x-1 > 0 && y-1 > 0
-    neighbours << board[y+1][x+1] if x+1 < board[0].length && y+1 < board.length
+    if y%2 != 0 then
+      neighbours << board[y+1][x] if y+1 < board.length
+      neighbours << board[y][x+1] if x+1 < board[0].length
+      neighbours << board[y-1][x] if y-1 > 0
+      neighbours << board[y][x-1] if x-1 > 0
+      neighbours << board[y-1][x+1] if x+1 < board[0].length && y-1 > 0
+      neighbours << board[y+1][x+1] if x+1 < board[0].length && y+1 < board.length
+    else
+      neighbours << board[y+1][x] if y+1 < board.length
+      neighbours << board[y][x+1] if x+1 < board[0].length
+      neighbours << board[y-1][x] if y-1 > 0
+      neighbours << board[y][x-1] if x-1 > 0
+      neighbours << board[y-1][x-1] if x+1 > 0 && y-1 > 0
+      neighbours << board[y+1][x-1] if x+1 > 0 && y+1 < board.length
+    end
+
     return neighbours
   end
   #color array = [[-1,-1...]] if no color
@@ -115,7 +129,7 @@ class GamesController < ApplicationController
   def change_color group, color, board
     board.map! do |row|
       row.map! do |x|
-        {figure: x["figure"], color: (x["figure"] == group ? color : x["color"])}
+        {"figure" => x["figure"], "color" => (x["figure"] == group ? color : x["color"])}
       end
     end
   end
