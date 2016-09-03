@@ -1,19 +1,40 @@
 class GamesController < ApplicationController
   def create
     p params
+    cells = params["board"]["cells"]
+    cells.map! do |row|
+      row.map! do |e|
+        {figure: e, color: nil}
+      end
+    end
+
+    b = Board.create(game_id: params["id"], width: params["board"]["width"], height: params["board"]["height"], figures: params["board"]["figures_count"], cells: cells.to_json)
+    p b
     render json: {status: :ok}
   end
 
   def show
     p params
+    x = [0,1,2,3].sample
     render json: {
       status: :ok,
-      figure: [0,1,2,3].sample
+      figure: x
     }
   end
 
   def update
     p params
+    b = Board.where("game_id = ?", params["id"]).first
+    p b.cells
+    cells = JSON.parse(b.cells)
+    p cells
+    change_color params["figure"], params["color"], cells
+    b.update(cells: cells.to_json)
+    p "new cells"
+    p cells
+    b.save
+    p "new"
+    p b.cells
     render json: {status: :ok}
   end
 
@@ -48,9 +69,9 @@ class GamesController < ApplicationController
   #color array = [[-1,-1...]] if no color
   #group and color are numbers
   def change_color group, color, board
-    for x in 0..board.length-1
-      for y in 0..board.length-1
-        board[y][x][:color] = color if board[y][x][:figure] == group
+    board.map! do |row|
+      row.map! do |x|
+        {figure: x["figure"], color: (x["figure"] == group ? color : x["color"])}
       end
     end
   end
