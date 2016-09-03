@@ -25,12 +25,16 @@ class GamesController < ApplicationController
   def update
     p params
     b = Board.where("game_id = ?", params["id"]).first
-    p b
+    p b.cells
     cells = JSON.parse(b.cells)
-    cells = change_color params["figure"], params["color"], cells
+    p cells
+    change_color params["figure"], params["color"], cells
     b.update(cells: cells.to_json)
+    p "new cells"
+    p cells
+    b.save
     p "new"
-    p b
+    p b.cells
     render json: {status: :ok}
   end
 
@@ -65,11 +69,10 @@ class GamesController < ApplicationController
   #color array = [[-1,-1...]] if no color
   #group and color are numbers
   def change_color group, color, board
-    for x in 0..board.length-1
-      for y in 0..board.length-1
-        board[y][x][:color] = color if board[y][x][:figure] == group
+    board.map! do |row|
+      row.map! do |x|
+        {figure: x["figure"], color: (x["figure"] == group ? color : x["color"])}
       end
     end
-    colorArray
   end
 end
