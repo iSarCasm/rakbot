@@ -55,12 +55,12 @@ class GamesController < ApplicationController
     end
   end
 
-  def good_figures board, cur_color
+  def good_figures board, figure_count
     figures = (1..figure_count).to_a
     #ba.each{|row| row.each{|elem| elem[:color]}}
     for x in 0..board.length-1
       for y in 0..board.length-1
-        figures.delete(board[y][x][:figure]) if board[y][x][:color] == cur_color
+        figures.delete(board[y][x][:figure]) if board[y][x][:color] != nil
       end
     end
     figures
