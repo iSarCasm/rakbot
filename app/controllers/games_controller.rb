@@ -20,11 +20,12 @@ class GamesController < ApplicationController
 
     cells = JSON.parse(b.cells)
 
-    current_color = b.turn % 4;
+    current_color = params["color"]
     p cells
     figs = good_figures cells, b.figures
-    figs = very_good_cells(current_color, figs, b.figures, cells)
     p "good cells are: #{figs}"
+    figs = very_good_cells(current_color, figs, b.figures, cells)
+    p "very good cells are: #{figs}"
     figs.sort! do |x,y|
       figure_volume(x, cells) <=> figure_volume(y, cells)
     end
@@ -58,6 +59,10 @@ class GamesController < ApplicationController
     p params
     render json: {status: :ok}
   end
+  def next_to_same_color? group, color, figures, board
+    #figures.delete_if(|me| connects?(me, group, ba) && color ==
+  end
+
 
   def figure_volume figure, board
     volume = 0
@@ -76,6 +81,10 @@ class GamesController < ApplicationController
       end
     end
     a
+  end
+
+  def group_color group, board
+    board.flatten.find{|item| item["figure"] == group}["color"]
   end
 
   def connects? group_1, group_2, board
