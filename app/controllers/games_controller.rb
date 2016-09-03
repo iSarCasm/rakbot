@@ -42,7 +42,13 @@ class GamesController < ApplicationController
     p params
     render json: {status: :ok}
   end
+  def next_to_same_color? group, color, figures, board
+    #figures.delete_if(|me| connects?(me, group, ba) && color ==   
+  end
 
+  def group_color group, board
+    board.flatten.find{|item| item["figure"] == group}["color"]
+  end
   def connects? group_1, group_2, board
     for x in 0..board.length-1
       for y in 0..board.length-1
@@ -77,7 +83,7 @@ class GamesController < ApplicationController
   end
 
   def good_figures board, figure_count
-    figures = (1..figure_count).to_a
+    figures = (0...figure_count).to_a
     #ba.each{|row| row.each{|elem| elem[:color]}}
     for x in 0..board.length-1
       for y in 0..board.length-1
