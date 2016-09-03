@@ -1,6 +1,15 @@
 class GamesController < ApplicationController
   def create
     p params
+    cells = params["board"]["cells"]
+    cells.map! do |row|
+      row.map! do |e|
+        {figure: e, color: nil}
+      end
+    end
+
+    b = Board.create(game_id: params["id"], width: params["board"]["width"], height: params["board"]["height"], figures: params["board"]["figures_count"], cells: cells.to_json)
+    p b
     render json: {status: :ok}
   end
 
