@@ -36,7 +36,8 @@ class GamesController < ApplicationController
   end
 
   def neighbours x, y, board
-    neighbours = [] << board[y+1][x] if y+1 < board.length
+    neighbours = []
+    neighbours << board[y+1][x] if y+1 < board.length
     neighbours << board[y][x+1] if x+1 < board[0].length
     neighbours << board[y-1][x] if y-1 > 0
     neighbours << board[y][x-1] if x-1 > 0
