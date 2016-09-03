@@ -45,7 +45,12 @@ class GamesController < ApplicationController
   end
   #color array = [[-1,-1...]] if no color
   #group and color are numbers
-  def change_color group, color, colorArray
-    #colorArray
+  def change_color group, color, board, colorArray
+    for x in 0..board.length-1
+      for y in 0..board.length-1
+        colorArray[y][x] = color if board[y][x] == group
+      end
+    end
+    colorArray
   end
 end
