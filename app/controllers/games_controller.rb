@@ -59,10 +59,6 @@ class GamesController < ApplicationController
     p params
     render json: {status: :ok}
   end
-  def next_to_same_color? group, color, figures, board
-    #figures.delete_if(|me| connects?(me, group, ba) && color ==
-  end
-
 
   def figure_volume figure, board
     volume = 0
@@ -106,22 +102,19 @@ class GamesController < ApplicationController
 
   def neighbours x, y, board
     neighbours = []
-    if y%2 != 0 then
-      neighbours << board[y+1][x] if y+1 < board.length
-      neighbours << board[y][x+1] if x+1 < board[0].length
-      neighbours << board[y-1][x] if y-1 > 0
-      neighbours << board[y][x-1] if x-1 > 0
-      neighbours << board[y-1][x+1] if x+1 < board[0].length && y-1 > 0
-      neighbours << board[y+1][x+1] if x+1 < board[0].length && y+1 < board.length
+    neighbours << board[y][x+1] if x+1 < board[0].length
+    neighbours << board[y][x-1] if x-1 > 0
+    if(y.odd?) then
+      neighbours << board[y-1][x] if y - 1 > 0
+      neighbours << board[y-1][x+1] if y -1 > 0 && x + 1 < board[0].length
+      neighbours << board[y+1][x] if y + 1 < board.length
+      neighbours << board[y+1][x+1] if x + 1 < board[0].length && y + 1 < board.length
     else
-      neighbours << board[y+1][x] if y+1 < board.length
-      neighbours << board[y][x+1] if x+1 < board[0].length
+      neighbours << board[y-1][x-1] if y-1 > 0 && x-1 > 0
       neighbours << board[y-1][x] if y-1 > 0
-      neighbours << board[y][x-1] if x-1 > 0
-      neighbours << board[y-1][x-1] if x+1 > 0 && y-1 > 0
-      neighbours << board[y+1][x-1] if x+1 > 0 && y+1 < board.length
+      neighbours << board[y+1][x-1] if x-1 > 0 && y+1 < board.length
+      neighbours << board[y+1][x] if y+1 < board.length
     end
-
     return neighbours
   end
   #color array = [[-1,-1...]] if no color
